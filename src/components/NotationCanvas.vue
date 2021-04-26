@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2021-04-21 13:41:20
- * @LastEditTime: 2021-04-23 16:10:45
+ * @LastEditTime: 2021-04-25 19:49:52
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /vue-capture/capture-component/src/components/NotationCanvas.vue
@@ -102,7 +102,7 @@
           </svg>
         </div>
       </div>
-      <!-- 涂鸦 图标 -->
+      <!-- 涂鸦 & 文字 图标 -->
       <div class="left select-num">
         <!-- 涂鸦 选中 -->
         <span v-if="isGraffiti" @click="graffitiClick">
@@ -143,7 +143,7 @@
           </svg>
         </span>
         <!-- 添加文字 -->
-        <span>
+        <span @click="addText">
           <svg
             t="1600674827471"
             class="icon"
@@ -161,6 +161,82 @@
             />
           </svg>
         </span>
+      </div>
+
+      <div class="right">
+        <button type="primary" :mini="true">确定</button>
+      </div>
+      <!-- 文字容器 -->
+      <!-- <div class="text-container">
+        <template v-for="(item, index) in addTexts">
+          <div
+            v-bind:key="index"
+            class="text-item"
+            ref="textContents"
+            @click="textClick(index)"
+            @touchstart="textItemDown($event, index)"
+            @touchmove="textItemMove($event, index)"
+            @touchend="textItemUp($event, index)"
+          >
+            {{item.textContent}}
+            <span class="text-item-content">{{item.textContent}}</span>
+          </div>
+        </template>
+        <div
+          v-show="showRemoveText"
+          class="remove-text"
+          :class="{'remove-text-active': removeTextActive}"
+          ref="removeText"
+        >
+          <div class="remove-icon">
+            <svg
+              t="1600930597787"
+              class="icon"
+              viewBox="0 0 1024 1024"
+              version="1.1"
+              xmlns="http://www.w3.org/2000/svg"
+              p-id="5266"
+              width="200"
+              height="200"
+            >
+              <path
+                d="M861.184 192.512q30.72 0 50.688 10.24t31.744 25.6 16.384 33.28 4.608 33.28q0 7.168-0.512 11.264t-0.512 7.168l0 6.144-67.584 0 0 537.6q0 20.48-8.192 39.424t-23.552 33.28-37.376 23.04-50.688 8.704l-456.704 0q-26.624 0-50.176-8.192t-40.448-23.04-26.624-35.84-9.728-47.616l0-527.36-63.488 0q-1.024-1.024-1.024-5.12-1.024-5.12-1.024-31.744 0-13.312 6.144-29.696t18.432-30.208 31.744-23.04 46.08-9.216l91.136 0 0-62.464q0-26.624 18.432-45.568t45.056-18.944l320.512 0q35.84 0 49.664 18.944t13.824 45.568l0 63.488q21.504 1.024 46.08 1.024l47.104 0zM384 192.512l320.512 0 0-64.512-320.512 0 0 64.512zM352.256 840.704q32.768 0 32.768-41.984l0-475.136-63.488 0 0 475.136q0 21.504 6.656 31.744t24.064 10.24zM545.792 839.68q17.408 0 23.552-9.728t6.144-31.232l0-475.136-63.488 0 0 475.136q0 40.96 33.792 40.96zM738.304 837.632q18.432 0 24.576-9.728t6.144-31.232l0-473.088-64.512 0 0 473.088q0 40.96 33.792 40.96z"
+                p-id="5267"
+                fill="#ffffff"
+              />
+            </svg>
+          </div>
+          <div v-if="removeTextActive" class="remove-tip">松手即可删除</div>
+          <div v-else class="remove-tip">拖动到此处删除</div>
+        </div>
+      </div>-->
+    </div>
+    <!-- 添加文字 mask -->
+    <div v-if="textMask" class="add-text-container" ref="addTextContainer">
+      <div class="shadow-full"></div>
+      <span class="cancel-add" @click="cancelAddText">取消</span>
+      <span class="confirm-add" @click="confirmAddText">完成</span>
+      <textarea
+        v-model="addTextValue"
+        :style="{color: currentTextColor}"
+        class="text-area"
+        wrap="hard"
+        spellcheck="false"
+        autocapitalize="off"
+        autocomplete="off"
+        autocorrect="off"
+      ></textarea>
+
+      <div class="graffiti-colors">
+        <template v-for="color in graffitiColors">
+          <div class="select-color" v-bind:key="color" @click="() => selectTextColor(color)">
+            <div
+              :class="{'color-item-active': currentTextColor === color}"
+              class="color-item"
+              :style="{background: color}"
+            ></div>
+          </div>
+        </template>
       </div>
     </div>
   </div>
@@ -201,6 +277,12 @@ export default {
       isGraffiti: false,
       drawImageDown: [],
       painting: false,
+      addTexts: [], // 添加的文字
+      textActiveIndex: -1,
+      showRemoveText: false,
+      textMask: false,
+      addTextValue: '',
+      currentTextColor: '',
     };
   },
   mounted() {
@@ -430,6 +512,44 @@ export default {
         }
       };
     },
+
+    // 添加文字
+    addText() {
+      this.addTexts.push({
+        textItemMoveFlag: false,
+        moveStartX: 0,
+        moveStartY: 0,
+        moveEndX: 0,
+        moveEndY: 0,
+        distance: 0,
+        angle: 0,
+        point1: {},
+        point2: {},
+        textContent: '',
+        textColor: '#e75d5a',
+      });
+      this.textMask = true;
+      this.visibleBtn = false;
+      this.textActiveIndex = this.addTexts.length - 1;
+    },
+
+    // 选择字体颜色
+    selectTextColor(color) {
+      this.currentTextColor = color;
+      this.addTexts[this.textActiveIndex].textColor = textColor;
+    },
+
+    // 取消添加字体
+    cancelAddText() {
+      this.textMask = false;
+      this.visibleBtn = true;
+    },
+
+    // 确定添加字体
+    confirmAddText() {
+      this.textMask = false;
+      this.visibleBtn = false;
+    },
   },
 };
 </script>
@@ -439,7 +559,6 @@ export default {
   box-sizing: border-box;
   height: calc(100vh);
   width: calc(100vw);
-  // background-color: #010101;
   position: relative;
   overflow: auto;
 
@@ -600,6 +719,82 @@ export default {
           top: -2px;
           font-size: 20px;
         }
+      }
+    }
+  }
+  .add-text-container {
+    position: fixed;
+    z-index: 1000;
+    top: 0;
+    right: 0;
+    left: 0;
+    bottom: 0;
+    background: transparent;
+    .shadow-full {
+      position: fixed;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      background-color: #010101;
+      opacity: 0.8;
+    }
+    .text-area {
+      position: fixed;
+      top: 40px;
+      right: 0;
+      bottom: 60px;
+      left: 0;
+      color: #ffffff;
+      font-size: 30px;
+      background: none;
+      text-decoration: none;
+      outline: none;
+      border: none;
+      caret-color: #5ab639;
+      max-width: 100%;
+      padding: 20px;
+      word-break: break-all;
+      box-sizing: border-box;
+      text-shadow: 0px 1px 1px #010101;
+    }
+    .cancel-add {
+      position: fixed;
+      left: 15px;
+      top: 10px;
+      color: #ffffff;
+      font-size: 16px;
+    }
+    .confirm-add {
+      position: fixed;
+      right: 15px;
+      top: 8px;
+      color: #ffffff;
+      font-size: 12px;
+      background-color: #5ab639;
+      border-radius: 4px;
+      padding: 4px 8px;
+    }
+    .graffiti-colors {
+      position: fixed;
+      right: 30px;
+      bottom: 30px;
+      left: 30px;
+      display: flex;
+      margin: 0 auto;
+      padding: 0;
+      display: flex;
+      justify-content: space-between;
+      pointer-events: auto;
+      .color-item {
+        width: 15px;
+        height: 15px;
+        box-shadow: 0 0 0 3px #ffffff;
+        border-radius: 15px;
+        pointer-events: auto;
+      }
+      .color-item-active {
+        box-shadow: 0 0 0 5px #ffffff;
       }
     }
   }
