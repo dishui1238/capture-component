@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2021-04-22 14:21:42
- * @LastEditTime: 2021-04-22 16:29:35
+ * @LastEditTime: 2021-04-26 13:10:57
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /vue-capture/capture-component/src/views/page.vue
