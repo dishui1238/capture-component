@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2021-04-21 13:41:20
- * @LastEditTime: 2021-04-29 13:36:01
+ * @LastEditTime: 2021-06-24 20:47:36
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /vue-capture/capture-component/src/components/NotationCanvas.vue
@@ -296,22 +296,22 @@ export default {
     },
 
     drawImages() {
-      let notationCanvas = this.$refs.notationCanvas;
+      const notationCanvas = this.$refs.notationCanvas;
       notationCanvas.style.width = this.canvasWidth + 'px';
       notationCanvas.style.height = this.canvasHeight + 'px';
       // 浏览器是否支持 canvas 标签
       if (notationCanvas.getContext) {
         // const canvasWidth = this.canvasWidth;
         // getContext() 方法可返回一个对象，该对象提供了用于在画布上绘图的方法和属性。
-        let ctx = notationCanvas.getContext('2d'); // 获取上下文
+        const ctx = notationCanvas.getContext('2d'); // 获取上下文
         this.context = ctx;
-        let ratio = this.getPixelRatio(ctx);
+        const ratio = this.getPixelRatio(ctx); // 解决canvas绘制模糊的问题
 
         const canvasWidth = this.canvasWidth * ratio;
         this.canvasWidthFull = this.canvasWidth * ratio;
         this.canvasHeightFull = this.canvasHeight * ratio;
 
-        let img = new Image();
+        const img = new Image();
         img.src = this.imagesBase64;
         img.onload = function () {
           ctx.drawImage(
@@ -327,7 +327,7 @@ export default {
 
     // 解决canvas绘制模糊的问题
     getPixelRatio(context) {
-      let backingStore =
+      const backingStore =
         context.backingStorePixelRatio ||
         context.webkitBackingStorePixelRatio ||
         context.mozBackingStorePixelRatio ||
@@ -371,7 +371,7 @@ export default {
           e.changedTouches[0].clientY -
           e.target.parentNode.offsetTop +
           (this.$refs.notationCanvasContent.scrollTop || 0);
-        let ratio = this.getPixelRatio(this.context);
+        const ratio = this.getPixelRatio(this.context);
         // 设置canvas的配置
         this.setCanvasStyle();
         // 清除子路径
@@ -392,8 +392,8 @@ export default {
         // 只有允许移动时调用
         console.log('move:', e);
         const t = e.target;
-        let canvasX;
-        let canvasY;
+        let canvasX = null;
+        let canvasY = null;
         // 由于手机端和pc端获取页面坐标方式不同，所以需要做出判断
         canvasX = e.changedTouches[0].clientX - t.parentNode.offsetLeft;
         canvasY =
@@ -401,7 +401,7 @@ export default {
           t.parentNode.offsetTop +
           (this.$refs.notationCanvasContent.scrollTop || 0);
 
-        let ratio = this.getPixelRatio(this.context);
+        const ratio = this.getPixelRatio(this.context);
         // 连接到移动的位置并上色
         this.context.lineTo(canvasX * ratio, canvasY * ratio);
         this.context.stroke(); // 绘制已定义的路径
@@ -422,8 +422,8 @@ export default {
 
         // 只有允许移动时调用
         const t = e.target;
-        let canvasX;
-        let canvasY;
+        let canvasX = null;
+        let canvasY = null;
         // 由于手机端和pc端获取页面坐标方式不同，所以需要做出判断
         canvasX = e.changedTouches[0].clientX - t.parentNode.offsetLeft;
         canvasY =
@@ -457,7 +457,7 @@ export default {
 
     // 撤销涂鸦
     withdrawGraffiti() {
-      let last = this.drawImageDown.pop() || 0;
+      const last = this.drawImageDown.pop() || 0;
       // 撤销绘画
       this.drawImageHistory.splice(last, this.drawImageHistory.length - last);
       // 光删一个还不完美，要把相应的删了，两个数组，一个记录所有的点，一个记录down点时的数组长度
@@ -465,25 +465,25 @@ export default {
     },
 
     redrawAll() {
-      let length = this.drawImageHistory.length;
+      const length = this.drawImageHistory.length;
       if (length === 0) {
         return;
       }
 
-      let ratio = this.getPixelRatio(this.context);
+      const ratio = this.getPixelRatio(this.context);
 
-      let ctx = this.context;
-      let width = this.canvasWidth * ratio;
-      let drawImageHistory = this.drawImageHistory;
-      let config = this.config;
+      const ctx = this.context;
+      const width = this.canvasWidth * ratio;
+      const drawImageHistory = this.drawImageHistory;
+      const config = this.config;
 
       const tempCanvas = document.createElement('canvas'); // 新建一个 canvas 作为缓存 canvas
       const tempCtx = tempCanvas.getContext('2d');
 
-      let img = new Image();
+      const img = new Image();
       img.src = this.imagesBase64;
       img.onload = function () {
-        let height = (width / img.width) * img.height;
+        const height = (width / img.width) * img.height;
         tempCanvas.width = width;
         tempCanvas.height = height; // 设置宽高
         tempCtx.drawImage(this, 0, 0, width, height);
@@ -556,14 +556,13 @@ export default {
       const _this = this;
       this.$nextTick(function () {
         // 位置
-        debugger;
-        let textContents = _this.$refs.textContents;
-        let t = textContents[_this.textActiveIndex];
-        let content = t.children[0];
-        let contentOffsetWidth = content.offsetWidth + 1; // 可能会出现差不到1换行
-        let offsetWidth = t.parentNode.offsetWidth - 10;
-        let offsetHeight = t.parentNode.offsetHeight;
-        let width =
+        const textContents = _this.$refs.textContents;
+        const t = textContents[_this.textActiveIndex];
+        const content = t.children[0];
+        const contentOffsetWidth = content.offsetWidth + 1; // 可能会出现差不到1换行
+        const offsetWidth = t.parentNode.offsetWidth - 10;
+        const offsetHeight = t.parentNode.offsetHeight;
+        const width =
           (contentOffsetWidth > offsetWidth
             ? offsetWidth
             : contentOffsetWidth) + 1;
@@ -617,9 +616,9 @@ export default {
       if (this.addTexts[index].textItemMoveFlag) {
         this.visibleBtn = false;
         this.showRemoveText = true;
-        let t = e.target;
-        let content = t.children[0];
-        let contentOffsetWidth = content.offsetWidth + 1; // 可能会出现差不到1换行
+        const t = e.target;
+        const content = t.children[0];
+        const contentOffsetWidth = content.offsetWidth + 1; // 可能会出现差不到1换行
         // 判断是两条手指还是一条手指，两根手指放大缩小，一根手指或者其他都是移动
         if (e.touches.length === 2 && e.changedTouches.length) {
           // 判断一下是否存在有没有移动手指的情况，得到两次移动的情况
@@ -649,8 +648,8 @@ export default {
           // t.style.width = width + 'px';
           // 暂时不考虑放大缩小了
         } else {
-          let offsetWidth = t.parentNode.offsetWidth - 10;
-          let width =
+          const offsetWidth = t.parentNode.offsetWidth - 10;
+          const width =
             contentOffsetWidth > offsetWidth ? offsetWidth : contentOffsetWidth;
           // text-item-content
           // 由于手机端和pc端获取页面坐标方式不同，所以需要做出判断
@@ -681,11 +680,11 @@ export default {
           }
 
           // 判断是否要进行删除动作
-          let removeTextEl = this.$refs.removeText;
-          let x = removeTextEl.offsetLeft;
-          let y = removeTextEl.offsetTop;
-          let x1 = removeTextEl.offsetLeft + removeTextEl.offsetWidth;
-          let y1 = removeTextEl.offsetTop + removeTextEl.offsetHeight;
+          const removeTextEl = this.$refs.removeText;
+          const x = removeTextEl.offsetLeft;
+          const y = removeTextEl.offsetTop;
+          const x1 = removeTextEl.offsetLeft + removeTextEl.offsetWidth;
+          const y1 = removeTextEl.offsetTop + removeTextEl.offsetHeight;
 
           if (
             e.changedTouches[0].clientX >= x &&
@@ -713,7 +712,7 @@ export default {
     },
     getAngle(point1, point2) {
       // 得到两个点之间的距离å
-      let radian = Math.atan2(point1.y - point2.y, point2.x - point1.x);
+      const radian = Math.atan2(point1.y - point2.y, point2.x - point1.x);
       return radian * (180 / Math.PI);
     },
     getDistance(point1, point2) {
@@ -724,7 +723,7 @@ export default {
     },
 
     drawText(contentWidth, addText, x, y) {
-      let ratio = this.getPixelRatio(this.context);
+      const ratio = this.getPixelRatio(this.context);
       // 画上文字
       this.context.font =
         "31px 'Helvetica Neue', -apple-system-font, sans-serif";
@@ -738,10 +737,10 @@ export default {
       // 先判断一次总长度，如果长度比contentWidth小，就不处理，如果大就处理
       if (this.context.measureText(addText.textContent).width >= contentWidth) {
         // 分割文本为单个的字符
-        let textChar = addText.textContent.split('');
+        const textChar = addText.textContent.split('');
         // 用于拼接
         let tmpText = '';
-        let textRows = [];
+        const textRows = [];
 
         for (let i = 0, length = textChar.length; i < length; i++) {
           // 如果在结束之前，或者已经是最后了，那么会存在一种情况，还是会小于contentWidth，导致另一部分丢失
@@ -771,7 +770,7 @@ export default {
       }
     },
     confirm() {
-      let notationCanvas = this.$refs.notationCanvas;
+      const notationCanvas = this.$refs.notationCanvas;
       this.context.shadowColor = 'rgba(238, 238, 238)';
       // 将阴影向右移动15px，向上移动10px
       this.context.shadowOffsetX = 0;
@@ -779,12 +778,12 @@ export default {
       // 轻微模糊阴影
       this.context.shadowBlur = 1;
       for (let i = 0, length = this.addTexts.length; i < length; i++) {
-        let addText = this.addTexts[i];
-        let addTextEl = this.$refs.textContents[i];
-        let x = addTextEl.offsetLeft;
-        let y = addTextEl.offsetTop + 13;
+        const addText = this.addTexts[i];
+        const addTextEl = this.$refs.textContents[i];
+        const x = addTextEl.offsetLeft;
+        const y = addTextEl.offsetTop + 13;
 
-        let offsetWidth = addTextEl.parentNode.offsetWidth - 10;
+        const offsetWidth = addTextEl.parentNode.offsetWidth - 10;
 
         this.drawText(offsetWidth, addText, x, y);
       }

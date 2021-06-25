@@ -12,7 +12,7 @@ module.exports = {
     "prefer-promise-reject-errors": 0,
     // allow debugger during development
     "no-debugger": process.env.NODE_ENV === "production" ? "error" : "off",
-    semi: ["error", "always"],
+    semi: 0,
     "space-before-function-paren": 0,
     "comma-dangle": 0,
     "no-unused-vars": 2,
