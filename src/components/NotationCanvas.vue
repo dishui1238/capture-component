@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2021-04-21 13:41:20
- * @LastEditTime: 2021-06-24 20:47:36
+ * @LastEditTime: 2021-06-27 10:11:40
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /vue-capture/capture-component/src/components/NotationCanvas.vue
@@ -365,20 +365,13 @@ export default {
          */
 
         // 计算 start 开始点的坐标
-        const canvasX =
-          e.changedTouches[0].clientX - e.target.parentNode.offsetLeft;
-        const canvasY =
-          e.changedTouches[0].clientY -
-          e.target.parentNode.offsetTop +
-          (this.$refs.notationCanvasContent.scrollTop || 0);
+        const canvasX = e.changedTouches[0].clientX - e.target.parentNode.offsetLeft;
+        const canvasY = e.changedTouches[0].clientY - e.target.parentNode.offsetTop +
+         (this.$refs.notationCanvasContent.scrollTop || 0);
         const ratio = this.getPixelRatio(this.context);
-        // 设置canvas的配置
-        this.setCanvasStyle();
-        // 清除子路径
-        this.context.beginPath();
-        // 移动的起点
-        this.context.moveTo(canvasX * ratio, canvasY * ratio);
-
+        this.setCanvasStyle(); // 设置canvas的配置
+        this.context.beginPath(); // 清除子路径
+        this.context.moveTo(canvasX * ratio, canvasY * ratio); // 移动的起点
         this.drawImageHistory.push({
           x: canvasX,
           y: canvasY,
@@ -421,14 +414,10 @@ export default {
         this.painting = false;
 
         // 只有允许移动时调用
+        // 计算 end 结束坐标
         const t = e.target;
-        let canvasX = null;
-        let canvasY = null;
-        // 由于手机端和pc端获取页面坐标方式不同，所以需要做出判断
-        canvasX = e.changedTouches[0].clientX - t.parentNode.offsetLeft;
-        canvasY =
-          e.changedTouches[0].clientY -
-          t.parentNode.offsetTop +
+        const canvasX = e.changedTouches[0].clientX - t.parentNode.offsetLeft;
+        const canvasY = e.changedTouches[0].clientY - t.parentNode.offsetTop +
           (this.$refs.notationCanvasContent.scrollTop || 0);
 
         this.drawImageHistory.push({
@@ -552,6 +541,7 @@ export default {
       this.visibleBtn = true;
       this.addTexts[this.textActiveIndex].textContent = this.addTextValue;
       this.addTextValue = '';
+      debugger;
 
       const _this = this;
       this.$nextTick(function () {

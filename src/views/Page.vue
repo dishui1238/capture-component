@@ -57,15 +57,16 @@ export default {
     };
   },
   methods: {
+    /**
+     * html2canvas(element, options);
+     * --------------------------
+     * html2canvas(document.body).then(function(canvas) {
+     *    document.body.appendChild(canvas);
+     * });
+     */
     handleClick() {
+      // 将 dom 及其子元素绘制到 canvas 上
       const capture = document.getElementById('capture');
-      /**
-       * html2canvas(element, options);
-       * --------------------------
-       * html2canvas(document.body).then(function(canvas) {
-       *    document.body.appendChild(canvas);
-       * });
-       */
       html2canvas(capture).then((canvas) => {
         this.dataURL = canvas.toDataURL('image/png');
         this.canvasWidth = capture.offsetWidth;
