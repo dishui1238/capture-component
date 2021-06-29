@@ -29,6 +29,7 @@
     "html2canvas": "^1.0.0-rc.7",
     "less": "^3.0.4",
     "less-loader": "^5.0.0",
+    "svg-sprite-loader": "^6.0.9",
     "vue-template-compiler": "^2.6.11",
     "vux": "^2.9.4"
   }

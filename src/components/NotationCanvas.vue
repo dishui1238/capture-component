@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2021-04-21 13:41:20
- * @LastEditTime: 2021-06-27 10:11:40
+ * @LastEditTime: 2021-06-29 19:36:29
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /vue-capture/capture-component/src/components/NotationCanvas.vue
@@ -64,8 +64,12 @@
           </div>
         </template>
         <!-- 撤销图标 白色-->
-        <div v-if="drawImageHistory.length" class="withdraw-btn-his" @click="withdrawGraffiti">
-          <svg
+        <div v-if="drawImageHistory.length" @click="withdrawGraffiti">
+          <svg class="withdraw-btn-his">
+            <use xlink:href="#icon-withdraw" />
+          </svg>
+        </div>
+        <!-- <svg
             t="1600741342265"
             class="icon"
             viewBox="0 0 1218 1024"
@@ -80,8 +84,8 @@
               p-id="669"
               fill="#ffffff"
             />
-          </svg>
-        </div>
+        </svg>-->
+        <!-- </div> -->
         <!-- 撤销图标 灰色 -->
         <div v-else class="withdraw-btn">
           <svg
@@ -243,6 +247,7 @@
 </template>
 
 <script>
+import '../assets/icons/withdraw.svg';
 export default {
   name: 'notationCanvas',
   components: {},
@@ -365,9 +370,12 @@ export default {
          */
 
         // 计算 start 开始点的坐标
-        const canvasX = e.changedTouches[0].clientX - e.target.parentNode.offsetLeft;
-        const canvasY = e.changedTouches[0].clientY - e.target.parentNode.offsetTop +
-         (this.$refs.notationCanvasContent.scrollTop || 0);
+        const canvasX =
+          e.changedTouches[0].clientX - e.target.parentNode.offsetLeft;
+        const canvasY =
+          e.changedTouches[0].clientY -
+          e.target.parentNode.offsetTop +
+          (this.$refs.notationCanvasContent.scrollTop || 0);
         const ratio = this.getPixelRatio(this.context);
         this.setCanvasStyle(); // 设置canvas的配置
         this.context.beginPath(); // 清除子路径
@@ -417,7 +425,9 @@ export default {
         // 计算 end 结束坐标
         const t = e.target;
         const canvasX = e.changedTouches[0].clientX - t.parentNode.offsetLeft;
-        const canvasY = e.changedTouches[0].clientY - t.parentNode.offsetTop +
+        const canvasY =
+          e.changedTouches[0].clientY -
+          t.parentNode.offsetTop +
           (this.$refs.notationCanvasContent.scrollTop || 0);
 
         this.drawImageHistory.push({
