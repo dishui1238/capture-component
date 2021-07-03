@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2021-04-21 13:41:20
- * @LastEditTime: 2021-06-29 19:36:29
+ * @LastEditTime: 2021-07-03 14:05:50
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /vue-capture/capture-component/src/components/NotationCanvas.vue
@@ -247,7 +247,7 @@
 </template>
 
 <script>
-import '../assets/icons/withdraw.svg';
+// import '../assets/icons/withdraw.svg';
 export default {
   name: 'notationCanvas',
   components: {},
@@ -330,8 +330,10 @@ export default {
       }
     },
 
-    // 解决canvas绘制模糊的问题
+    // 解决canvas绘制模糊的问题, 按实际渲染倍率来缩放canvas
+    // 获取像素比，将 Canvas 宽高进行放大
     getPixelRatio(context) {
+      // 浏览器在渲染canvas之前会用几个像素来来存储画布信息
       const backingStore =
         context.backingStorePixelRatio ||
         context.webkitBackingStorePixelRatio ||
@@ -340,6 +342,7 @@ export default {
         context.oBackingStorePixelRatio ||
         context.backingStorePixelRatio ||
         1;
+      // 设备像素比: 用几个像素点宽度来渲染1个像素
       return (window.devicePixelRatio || 1) / backingStore;
     },
 
@@ -348,27 +351,23 @@ export default {
       this.setCanvasStyle();
     },
 
+    /**
+     * 1. TouchEvent.changedTouches
+     * 对于 touchstart 事件, 这个 TouchList 对象列出在此次事件中 **新增加** 的触点。
+     * 对于 touchmove 事件，列出和上次事件相比较，发生了变化的触点。
+     * 对于 touchend 事件，changedTouches 是已经从触摸面的离开的触点的集合（也就是说，手指已经离开了屏幕/触摸面。
+     *
+     * 2. TouchEvent.touches
+     * 一个 TouchList，其会列出所有 当前 在与触摸表面接触的 Touch 对象，不管触摸点是否已经改变或其目标元素是在处于 touchstart 阶段。
+     *
+     */
     canvasStart(e) {
       // 开启时才画，而且画的时候把其他的隐藏
-      console.log('start', e);
       if (this.isGraffiti) {
         this.visibleBtn = false;
         // 让move方法可用
         this.painting = true;
-        // client是基于整个页面的坐标
-        // offset是cavas距离顶部以及左边的距离
-
-        /**
-         * 1. TouchEvent.changedTouches
-         * 对于 touchstart 事件, 这个 TouchList 对象列出在此次事件中 **新增加** 的触点。
-         * 对于 touchmove 事件，列出和上次事件相比较，发生了变化的触点。
-         * 对于 touchend 事件，changedTouches 是已经从触摸面的离开的触点的集合（也就是说，手指已经离开了屏幕/触摸面。
-         *
-         * 2. TouchEvent.touches
-         * 一个 TouchList，其会列出所有 当前 在与触摸表面接触的 Touch 对象，不管触摸点是否已经改变或其目标元素是在处于 touchstart 阶段。
-         *
-         */
-
+        // client是基于整个页面的坐标 offset是cavas距离顶部以及左边的距离
         // 计算 start 开始点的坐标
         const canvasX =
           e.changedTouches[0].clientX - e.target.parentNode.offsetLeft;
@@ -391,22 +390,18 @@ export default {
     canvasMove(e) {
       if (this.painting) {
         // 只有允许移动时调用
-        console.log('move:', e);
         const t = e.target;
         let canvasX = null;
         let canvasY = null;
-        // 由于手机端和pc端获取页面坐标方式不同，所以需要做出判断
         canvasX = e.changedTouches[0].clientX - t.parentNode.offsetLeft;
         canvasY =
           e.changedTouches[0].clientY -
           t.parentNode.offsetTop +
           (this.$refs.notationCanvasContent.scrollTop || 0);
-
         const ratio = this.getPixelRatio(this.context);
         // 连接到移动的位置并上色
         this.context.lineTo(canvasX * ratio, canvasY * ratio);
         this.context.stroke(); // 绘制已定义的路径
-
         this.drawImageHistory.push({
           x: canvasX,
           y: canvasY,
@@ -420,16 +415,13 @@ export default {
         this.visibleBtn = true;
         // 设置move时不可绘制
         this.painting = false;
-
         // 只有允许移动时调用
-        // 计算 end 结束坐标
         const t = e.target;
         const canvasX = e.changedTouches[0].clientX - t.parentNode.offsetLeft;
         const canvasY =
           e.changedTouches[0].clientY -
           t.parentNode.offsetTop +
           (this.$refs.notationCanvasContent.scrollTop || 0);
-
         this.drawImageHistory.push({
           x: canvasX,
           y: canvasY,
@@ -437,8 +429,7 @@ export default {
           mode: 'up',
         });
         // 存储
-        this.drawImageDown.push(this.drawImageHistory.length - 1);
-        console.log('drawImageDown', this.drawImageDown);
+        this.drawImageDown.push(this.drawImageHistory.length);
       }
     },
 
@@ -457,18 +448,16 @@ export default {
     // 撤销涂鸦
     withdrawGraffiti() {
       const last = this.drawImageDown.pop() || 0;
+      const rest = this.drawImageDown.length
+        ? this.drawImageDown[this.drawImageDown.length - 1]
+        : 0;
       // 撤销绘画
-      this.drawImageHistory.splice(last, this.drawImageHistory.length - last);
-      // 光删一个还不完美，要把相应的删了，两个数组，一个记录所有的点，一个记录down点时的数组长度
+      this.drawImageHistory.splice(rest, last - rest);
       this.redrawAll();
     },
 
     redrawAll() {
       const length = this.drawImageHistory.length;
-      if (length === 0) {
-        return;
-      }
-
       const ratio = this.getPixelRatio(this.context);
 
       const ctx = this.context;
@@ -476,7 +465,8 @@ export default {
       const drawImageHistory = this.drawImageHistory;
       const config = this.config;
 
-      const tempCanvas = document.createElement('canvas'); // 新建一个 canvas 作为缓存 canvas
+      // 新建一个 canvas 作为缓存 canvas
+      const tempCanvas = document.createElement('canvas');
       const tempCtx = tempCanvas.getContext('2d');
 
       const img = new Image();

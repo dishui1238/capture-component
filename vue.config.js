@@ -1,5 +1,5 @@
 const path = require('path');
-const dir = path.resolve(__dirname, 'src/assets/icons');
+const dir = path.resolve(__dirname, 'src/assets/icons/svg');
 
 module.exports = {
   chainWebpack: config => {
