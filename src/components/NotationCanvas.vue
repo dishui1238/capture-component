@@ -1,38 +1,15 @@
-<!--
- * @Author: your name
- * @Date: 2021-04-21 13:41:20
- * @LastEditTime: 2021-07-03 14:05:50
- * @LastEditors: Please set LastEditors
- * @Description: In User Settings Edit
- * @FilePath: /vue-capture/capture-component/src/components/NotationCanvas.vue
--->
-
 <template>
   <div class="notation-canvas-wrapper" ref="notationCanvasContent">
     <!-- 阴影部分 -->
-    <div v-show="visible" class="shadow-container">
+    <div v-show="visible" class="shadow">
       <div class="shadow-top"></div>
       <div class="shadow-bottom"></div>
     </div>
     <!-- 头部按钮 -->
     <div class="notation-header">
       <span class="go-back" v-show="visibleBtn">
-        <svg
-          @click="closeCanvas"
-          t="1600650367784"
-          class="icon"
-          viewBox="0 0 1024 1024"
-          version="1.1"
-          xmlns="http://www.w3.org/2000/svg"
-          p-id="12200"
-          width="200"
-          height="200"
-        >
-          <path
-            d="M511.706311 64.021106C264.433578 64.021106 63.981197 264.473487 63.981197 511.745197s200.452381 447.725114 447.725114 447.725114 447.725114-200.452381 447.725114-447.725114S758.979044 64.021106 511.706311 64.021106zM529.803481 710.385303c52.024887-10.645454 91.159186-56.678884 91.159186-111.852484 0-105.366769-102.46672-106.256022-142.713352-106.256022l0 77.441766L345.361749 441.902502l132.887566-128.796388 0 65.924455c27.724435 0 199.799512 1.353834 199.799512 162.41609C678.048827 628.149347 613.390201 699.045023 529.803481 710.385303z"
-            fill="#ffffff"
-            p-id="12201"
-          />
+        <svg class="icon" @click="closeCanvas">
+          <use xlink:href="#icon-back" />
         </svg>
       </span>
     </div>
@@ -69,40 +46,10 @@
             <use xlink:href="#icon-withdraw" />
           </svg>
         </div>
-        <!-- <svg
-            t="1600741342265"
-            class="icon"
-            viewBox="0 0 1218 1024"
-            version="1.1"
-            xmlns="http://www.w3.org/2000/svg"
-            p-id="668"
-            width="200"
-            height="200"
-          >
-            <path
-              d="M0 440.016437L484.87467 0v236.764309c77.844438 10.519519 150.879953 13.900792 220.534194 31.107719 144.643381 35.616085 253.144702 126.083945 341.132962 243.677135 100.987379 135.250954 179.583211 361.796302 171.167596 512.450837-68.452011-147.648958-164.780746-255.474024-301.23393-324.376871-133.823305-67.24978-276.888758-89.040211-428.820664-86.184914v268.848841z"
-              p-id="669"
-              fill="#ffffff"
-            />
-        </svg>-->
-        <!-- </div> -->
         <!-- 撤销图标 灰色 -->
         <div v-else class="withdraw-btn">
-          <svg
-            t="1600691506307"
-            class="icon"
-            viewBox="0 0 1024 1024"
-            version="1.1"
-            xmlns="http://www.w3.org/2000/svg"
-            p-id="666"
-            width="200"
-            height="200"
-          >
-            <path
-              d="M1024.064 640q0 94.848-72.576 257.728l-6.016 13.728q-4.288 9.728-7.712 17.152t-7.424 12.576q-6.848 9.728-16 9.728-8.576 0-13.44-5.728t-4.864-14.272q0-5.152 1.44-15.136t1.44-13.44q2.848-38.848 2.848-70.272 0-57.728-10.016-103.424t-27.712-79.136-45.728-57.728-60.288-39.712-76-24.288-88-12.288-100.288-3.424h-128v146.272q0 14.848-10.848 25.728t-25.728 10.848-25.728-10.848L10.848 391.488Q0 380.64 0 365.76t10.848-25.728L303.424 47.456q10.848-10.848 25.728-10.848t25.728 10.848 10.848 25.728v146.272h128q407.424 0 500 230.272 30.272 76.576 30.272 190.272z"
-              p-id="667"
-              fill="#000000"
-            />
+          <svg class="withdraw-btn-his">
+            <use xlink:href="#icon-withdraw-gray" />
           </svg>
         </div>
       </div>
@@ -110,59 +57,26 @@
       <div class="left select-num">
         <!-- 涂鸦 选中 -->
         <span v-if="isGraffiti" @click="graffitiClick">
-          <svg
-            t="1600674152427"
-            class="icon"
-            viewBox="0 0 1024 1024"
-            version="1.1"
-            xmlns="http://www.w3.org/2000/svg"
-            p-id="1760"
-            width="200"
-            height="200"
-          >
-            <path
-              d="M907.264 948.224l-49.152-36.864c96.256-122.88 96.256-167.936 92.16-182.272h-2.048c-30.72 0-124.928 38.912-190.464 65.536-167.936 69.632-272.384 110.592-319.488 63.488-49.152-51.2 22.528-147.456 149.504-313.344 40.96-51.2 96.256-124.928 120.832-167.936-61.44 43.008-180.224 159.744-272.384 249.856C157.696 901.12 75.776 968.704 28.672 925.696c-30.72-28.672-79.872-75.776 366.592-847.872l53.248 30.72C120.832 673.792 73.728 829.44 71.68 870.4c57.344-26.624 217.088-182.272 325.632-288.768 258.048-251.904 327.68-311.296 370.688-272.384 47.104 40.96-8.192 116.736-129.024 274.432-57.344 75.776-153.6 198.656-151.552 235.52 30.72 12.288 172.032-47.104 247.808-77.824 153.6-63.488 229.376-94.208 262.144-51.2 38.912 49.152 10.24 129.024-90.112 258.048zM71.68 882.688z"
-              fill="#4cc06d"
-              p-id="1761"
-            />
+          <svg class="icon">
+            <use xlink:href="#icon-graffiti" />
           </svg>
         </span>
         <!-- 涂鸦 未选中 -->
         <span v-else @click="graffitiClick">
-          <svg
-            t="1600674152427"
-            class="icon"
-            viewBox="0 0 1024 1024"
-            version="1.1"
-            xmlns="http://www.w3.org/2000/svg"
-            p-id="1760"
-            width="200"
-            height="200"
-          >
-            <path
-              d="M907.264 948.224l-49.152-36.864c96.256-122.88 96.256-167.936 92.16-182.272h-2.048c-30.72 0-124.928 38.912-190.464 65.536-167.936 69.632-272.384 110.592-319.488 63.488-49.152-51.2 22.528-147.456 149.504-313.344 40.96-51.2 96.256-124.928 120.832-167.936-61.44 43.008-180.224 159.744-272.384 249.856C157.696 901.12 75.776 968.704 28.672 925.696c-30.72-28.672-79.872-75.776 366.592-847.872l53.248 30.72C120.832 673.792 73.728 829.44 71.68 870.4c57.344-26.624 217.088-182.272 325.632-288.768 258.048-251.904 327.68-311.296 370.688-272.384 47.104 40.96-8.192 116.736-129.024 274.432-57.344 75.776-153.6 198.656-151.552 235.52 30.72 12.288 172.032-47.104 247.808-77.824 153.6-63.488 229.376-94.208 262.144-51.2 38.912 49.152 10.24 129.024-90.112 258.048zM71.68 882.688z"
-              fill="#ffffff"
-              p-id="1761"
-            />
+          <svg class="icon">
+            <use xlink:href="#icon-graffiti-unselect" />
           </svg>
         </span>
+        <!-- 笔 粗细 -->
+        <!-- <span class="pen-linewidth-box">
+          <span class="pen-linewidth-span pen-linewidth-1"></span>
+          <span class="pen-linewidth-span pen-linewidth-2"></span>
+          <span class="pen-linewidth-span pen-linewidth-3"></span>
+        </span> -->
         <!-- 添加文字 -->
         <span @click="addText">
-          <svg
-            t="1600674827471"
-            class="icon"
-            viewBox="0 0 1024 1024"
-            version="1.1"
-            xmlns="http://www.w3.org/2000/svg"
-            p-id="589"
-            width="200"
-            height="200"
-          >
-            <path
-              d="M955.733333 0H68.266667a68.266667 68.266667 0 0 0-68.266667 68.266667v887.466666a68.266667 68.266667 0 0 0 68.266667 68.266667h887.466666a68.266667 68.266667 0 0 0 68.266667-68.266667V68.266667a68.266667 68.266667 0 0 0-68.266667-68.266667z m-204.8 358.4h-187.733333v409.6h-102.4v-409.6H273.066667v-102.4h477.866666z"
-              p-id="590"
-              fill="#ffffff"
-            />
+          <svg class="icon">
+            <use xlink:href="#icon-text" />
           </svg>
         </span>
       </div>
@@ -194,21 +108,8 @@
         ref="removeText"
       >
         <div class="remove-icon">
-          <svg
-            t="1600930597787"
-            class="icon"
-            viewBox="0 0 1024 1024"
-            version="1.1"
-            xmlns="http://www.w3.org/2000/svg"
-            p-id="5266"
-            width="200"
-            height="200"
-          >
-            <path
-              d="M861.184 192.512q30.72 0 50.688 10.24t31.744 25.6 16.384 33.28 4.608 33.28q0 7.168-0.512 11.264t-0.512 7.168l0 6.144-67.584 0 0 537.6q0 20.48-8.192 39.424t-23.552 33.28-37.376 23.04-50.688 8.704l-456.704 0q-26.624 0-50.176-8.192t-40.448-23.04-26.624-35.84-9.728-47.616l0-527.36-63.488 0q-1.024-1.024-1.024-5.12-1.024-5.12-1.024-31.744 0-13.312 6.144-29.696t18.432-30.208 31.744-23.04 46.08-9.216l91.136 0 0-62.464q0-26.624 18.432-45.568t45.056-18.944l320.512 0q35.84 0 49.664 18.944t13.824 45.568l0 63.488q21.504 1.024 46.08 1.024l47.104 0zM384 192.512l320.512 0 0-64.512-320.512 0 0 64.512zM352.256 840.704q32.768 0 32.768-41.984l0-475.136-63.488 0 0 475.136q0 21.504 6.656 31.744t24.064 10.24zM545.792 839.68q17.408 0 23.552-9.728t6.144-31.232l0-475.136-63.488 0 0 475.136q0 40.96 33.792 40.96zM738.304 837.632q18.432 0 24.576-9.728t6.144-31.232l0-473.088-64.512 0 0 473.088q0 40.96 33.792 40.96z"
-              p-id="5267"
-              fill="#ffffff"
-            />
+          <svg class="icon">
+            <use xlink:href="#icon-delete" />
           </svg>
         </div>
         <div v-if="removeTextActive" class="remove-tip">松手即可删除</div>
@@ -247,7 +148,7 @@
 </template>
 
 <script>
-// import '../assets/icons/withdraw.svg';
+import './index.less';
 export default {
   name: 'notationCanvas',
   components: {},
@@ -331,9 +232,10 @@ export default {
     },
 
     // 解决canvas绘制模糊的问题, 按实际渲染倍率来缩放canvas
-    // 获取像素比，将 Canvas 宽高进行放大
+    //  获取像素比，将 Canvas 宽高进行放大
     getPixelRatio(context) {
       // 浏览器在渲染canvas之前会用几个像素来来存储画布信息
+      // FIXME: backingStorePixelRatio 属性已被废弃
       const backingStore =
         context.backingStorePixelRatio ||
         context.webkitBackingStorePixelRatio ||
@@ -541,7 +443,6 @@ export default {
       this.visibleBtn = true;
       this.addTexts[this.textActiveIndex].textContent = this.addTextValue;
       this.addTextValue = '';
-      debugger;
 
       const _this = this;
       this.$nextTick(function () {
@@ -780,309 +681,12 @@ export default {
 
       // 得到图片
       var base64Img = notationCanvas.toDataURL('image/jpg');
-      console.log(base64Img);
-      // this.$emit('closeCanvas');
+      const link = document.createElement('a');
+      link.href = base64Img;
+      link.download = '拒绝原因.png';
+      link.click();
+      this.$emit('closeCanvas');
     },
   },
 };
 </script>
-
-<style lang="less">
-.notation-canvas-wrapper {
-  box-sizing: border-box;
-  height: calc(100vh);
-  width: calc(100vw);
-  position: relative;
-  overflow: auto;
-  .text-container {
-    position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    pointer-events: none;
-    .text-item {
-      position: absolute;
-      left: 0;
-      top: 50px;
-      font-size: 16px;
-      color: #333;
-      pointer-events: auto;
-      z-index: 300;
-      text-shadow: 0 1px 1px #eeeeee;
-      word-break: break-all;
-      .text-item-content {
-        position: absolute;
-        visibility: hidden;
-        white-space: nowrap;
-        pointer-events: none;
-      }
-    }
-    .remove-text {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      margin: auto;
-      width: 120px;
-      height: 60px;
-      background: rgba(27, 27, 27, 0.7);
-      border-radius: 8px;
-      color: #ffffff;
-      z-index: 300;
-      text-align: center;
-      vertical-align: middle;
-      line-height: 20px;
-      pointer-events: auto;
-      .remove-icon {
-        font-size: 16px;
-        line-height: 28px;
-        margin-top: 8px;
-      }
-      .remove-tip {
-        font-size: 10px;
-      }
-    }
-    .remove-text-active {
-      background: rgb(231, 93, 90);
-    }
-  }
-
-  .shadow-container {
-    overflow: hidden;
-    z-index: 20;
-    pointer-events: none;
-    .shadow-top {
-      position: fixed;
-      top: -60px;
-      right: -60px;
-      left: -60px;
-      height: 120px;
-      background: -webkit-linear-gradient(
-        top,
-        rgba(0, 0, 0, 0.2),
-        rgba(0, 0, 0, 0.1)
-      );
-      background: -o-linear-gradient(
-        top,
-        rgba(0, 0, 0, 0.2),
-        rgba(0, 0, 0, 0.1)
-      );
-      background: -moz-linear-gradient(
-        top,
-        rgba(0, 0, 0, 0.2),
-        rgba(0, 0, 0, 0.1)
-      );
-      background: linear-gradient(
-        to bottom,
-        rgba(0, 0, 0, 0.2),
-        rgba(0, 0, 0, 0.1)
-      );
-      -webkit-filter: blur(10px);
-      -moz-filter: blur(10px);
-      -ms-filter: blur(10px);
-      filter: blur(10px);
-      pointer-events: none;
-    }
-    .shadow-bottom {
-      position: fixed;
-      right: -60px;
-      bottom: -60px;
-      left: -60px;
-      height: 140px;
-      background: -webkit-linear-gradient(
-        top,
-        rgba(0, 0, 0, 0.1),
-        rgba(0, 0, 0, 0.2)
-      );
-      background: -o-linear-gradient(
-        top,
-        rgba(0, 0, 0, 0.1),
-        rgba(0, 0, 0, 0.2)
-      );
-      background: -moz-linear-gradient(
-        top,
-        rgba(0, 0, 0, 0.1),
-        rgba(0, 0, 0, 0.2)
-      );
-      background: linear-gradient(
-        to bottom,
-        rgba(0, 0, 0, 0.1),
-        rgba(0, 0, 0, 0.2)
-      );
-      -webkit-filter: blur(10px);
-      -moz-filter: blur(10px);
-      -ms-filter: blur(10px);
-      filter: blur(10px);
-      pointer-events: auto;
-    }
-  }
-  .icon {
-    width: 1.5em;
-    height: 1.5em;
-    vertical-align: -0.15em;
-    fill: currentColor;
-    overflow: hidden;
-  }
-  .notation-header {
-    position: fixed;
-    top: 5px;
-    right: 15px;
-    left: 15px;
-    font-size: 30px;
-    z-index: 200;
-    pointer-events: none;
-    .go-back {
-      pointer-events: auto;
-    }
-  }
-  .footer {
-    position: fixed;
-    right: 15px;
-    bottom: 15px;
-    left: 20px;
-    z-index: 200;
-    pointer-events: none;
-    .left {
-      float: left;
-      font-size: 18px;
-      span {
-        margin-right: 20px;
-        pointer-events: auto;
-      }
-    }
-    .right {
-      float: right;
-      pointer-events: auto;
-    }
-    .graffiti-colors {
-      position: fixed;
-      right: 0px;
-      bottom: 40px;
-      left: 0px;
-      display: flex;
-      margin: 0 auto;
-      padding: 15px 20px;
-      display: flex;
-      justify-content: space-between;
-      pointer-events: auto;
-      .select-color {
-        width: 20px;
-        height: 20px;
-        padding: 3px;
-        .color-item {
-          width: 15px;
-          height: 15px;
-          box-shadow: 0 0 0 3px #ffffff;
-          border-radius: 15px;
-          pointer-events: auto;
-        }
-        .color-item-active {
-          box-shadow: 0 0 0 5px #ffffff;
-        }
-      }
-      .withdraw-btn-his {
-        position: relative;
-        width: 20px;
-        height: 20px;
-        margin-top: -2px;
-        pointer-events: auto;
-        div {
-          position: absolute;
-          top: -2px;
-          font-size: 20px;
-        }
-      }
-      .withdraw-btn {
-        position: relative;
-        width: 20px;
-        height: 20px;
-        margin-top: -2px;
-        opacity: 0.2;
-        pointer-events: auto;
-        div {
-          position: absolute;
-          top: -2px;
-          font-size: 20px;
-        }
-      }
-    }
-  }
-  .add-text-container {
-    position: fixed;
-    z-index: 1000;
-    top: 0;
-    right: 0;
-    left: 0;
-    bottom: 0;
-    background: transparent;
-    .shadow-full {
-      position: fixed;
-      top: 0;
-      right: 0;
-      bottom: 0;
-      left: 0;
-      background-color: #010101;
-      opacity: 0.8;
-    }
-    .text-area {
-      position: fixed;
-      top: 40px;
-      right: 0;
-      bottom: 60px;
-      left: 0;
-      color: #ffffff;
-      font-size: 30px;
-      background: none;
-      text-decoration: none;
-      outline: none;
-      border: none;
-      caret-color: #5ab639;
-      max-width: 100%;
-      padding: 20px;
-      word-break: break-all;
-      box-sizing: border-box;
-      text-shadow: 0px 1px 1px #010101;
-    }
-    .cancel-add {
-      position: fixed;
-      left: 15px;
-      top: 10px;
-      color: #ffffff;
-      font-size: 16px;
-    }
-    .confirm-add {
-      position: fixed;
-      right: 15px;
-      top: 8px;
-      color: #ffffff;
-      font-size: 12px;
-      background-color: #5ab639;
-      border-radius: 4px;
-      padding: 4px 8px;
-    }
-    .graffiti-colors {
-      position: fixed;
-      right: 30px;
-      bottom: 30px;
-      left: 30px;
-      display: flex;
-      margin: 0 auto;
-      padding: 0;
-      display: flex;
-      justify-content: space-between;
-      pointer-events: auto;
-      .color-item {
-        width: 15px;
-        height: 15px;
-        box-shadow: 0 0 0 3px #ffffff;
-        border-radius: 15px;
-        pointer-events: auto;
-      }
-      .color-item-active {
-        box-shadow: 0 0 0 5px #ffffff;
-      }
-    }
-  }
-}
-</style>
