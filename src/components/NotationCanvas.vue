@@ -20,9 +20,9 @@
         ref="notationCanvas"
         :width="canvasWidthFull"
         :height="canvasHeightFull"
-        @touchstart="canvasStart($event)"
-        @touchend="canvasEnd($event)"
-        @touchmove="canvasMove($event)"
+        @touchstart="touchstart($event)"
+        @touchend="touchend($event)"
+        @touchmove="touchmove($event)"
       >
         <p>您的浏览器暂不支持！</p>
       </canvas>
@@ -41,7 +41,7 @@
           </div>
         </template>
         <!-- 撤销图标 白色-->
-        <div v-if="drawImageHistory.length" @click="withdrawGraffiti">
+        <div v-if="linePoints.length" @click="withdrawGraffiti">
           <svg class="withdraw-btn-his">
             <use xlink:href="#icon-withdraw" />
           </svg>
@@ -72,7 +72,7 @@
           <span class="pen-linewidth-span pen-linewidth-1"></span>
           <span class="pen-linewidth-span pen-linewidth-2"></span>
           <span class="pen-linewidth-span pen-linewidth-3"></span>
-        </span> -->
+        </span>-->
         <!-- 添加文字 -->
         <span @click="addText">
           <svg class="icon">
@@ -93,9 +93,9 @@
           class="text-item"
           ref="textContents"
           @click="textClick(index)"
-          @touchstart="textItemDown($event, index)"
+          @touchstart="textItemStart($event, index)"
           @touchmove="textItemMove($event, index)"
-          @touchend="textItemUp($event, index)"
+          @touchend="textItemEnd($event, index)"
         >
           {{item.textContent}}
           <span class="text-item-content">{{item.textContent}}</span>
@@ -175,13 +175,13 @@ export default {
         '#6168ed',
       ],
       config: {
-        lineWidth: 1,
+        lineWidth: 2,
         lineColor: '#f2849e',
         shadowBlur: 1,
       },
-      drawImageHistory: [],
+      linePoints: [],
       isGraffiti: false,
-      drawImageDown: [],
+      pointsLength: [],
       painting: false,
       addTexts: [], // 添加的文字
       textActiveIndex: -1,
@@ -221,7 +221,7 @@ export default {
         img.src = this.imagesBase64;
         img.onload = function () {
           ctx.drawImage(
-            this,
+            img,
             0,
             0,
             canvasWidth,
@@ -233,19 +233,19 @@ export default {
 
     // 解决canvas绘制模糊的问题, 按实际渲染倍率来缩放canvas
     //  获取像素比，将 Canvas 宽高进行放大
-    getPixelRatio(context) {
+    getPixelRatio() {
       // 浏览器在渲染canvas之前会用几个像素来来存储画布信息
       // FIXME: backingStorePixelRatio 属性已被废弃
-      const backingStore =
-        context.backingStorePixelRatio ||
-        context.webkitBackingStorePixelRatio ||
-        context.mozBackingStorePixelRatio ||
-        context.msBackingStorePixelRatio ||
-        context.oBackingStorePixelRatio ||
-        context.backingStorePixelRatio ||
-        1;
+      // const backingStore =
+      //   context.backingStorePixelRatio ||
+      //   context.webkitBackingStorePixelRatio ||
+      //   context.mozBackingStorePixelRatio ||
+      //   context.msBackingStorePixelRatio ||
+      //   context.oBackingStorePixelRatio ||
+      //   context.backingStorePixelRatio ||
+      //   1;
       // 设备像素比: 用几个像素点宽度来渲染1个像素
-      return (window.devicePixelRatio || 1) / backingStore;
+      return (window.devicePixelRatio || 1);
     },
 
     selectGraffitiColor(graffitiColor) {
@@ -263,7 +263,7 @@ export default {
      * 一个 TouchList，其会列出所有 当前 在与触摸表面接触的 Touch 对象，不管触摸点是否已经改变或其目标元素是在处于 touchstart 阶段。
      *
      */
-    canvasStart(e) {
+    touchstart(e) {
       // 开启时才画，而且画的时候把其他的隐藏
       if (this.isGraffiti) {
         this.visibleBtn = false;
@@ -279,17 +279,17 @@ export default {
           (this.$refs.notationCanvasContent.scrollTop || 0);
         const ratio = this.getPixelRatio(this.context);
         this.setCanvasStyle(); // 设置canvas的配置
-        this.context.beginPath(); // 清除子路径
+        this.context.beginPath(); // 开始一条路径
         this.context.moveTo(canvasX * ratio, canvasY * ratio); // 移动的起点
-        this.drawImageHistory.push({
+        this.linePoints.push({
           x: canvasX,
           y: canvasY,
           color: this.currentGraffitiColor,
-          mode: 'down',
+          mode: 'start',
         });
       }
     },
-    canvasMove(e) {
+    touchmove(e) {
       if (this.painting) {
         // 只有允许移动时调用
         const t = e.target;
@@ -304,7 +304,7 @@ export default {
         // 连接到移动的位置并上色
         this.context.lineTo(canvasX * ratio, canvasY * ratio);
         this.context.stroke(); // 绘制已定义的路径
-        this.drawImageHistory.push({
+        this.linePoints.push({
           x: canvasX,
           y: canvasY,
           color: this.currentGraffitiColor,
@@ -312,7 +312,7 @@ export default {
         });
       }
     },
-    canvasEnd(e) {
+    touchend(e) {
       if (this.isGraffiti) {
         this.visibleBtn = true;
         // 设置move时不可绘制
@@ -324,14 +324,14 @@ export default {
           e.changedTouches[0].clientY -
           t.parentNode.offsetTop +
           (this.$refs.notationCanvasContent.scrollTop || 0);
-        this.drawImageHistory.push({
+        this.linePoints.push({
           x: canvasX,
           y: canvasY,
           color: this.currentGraffitiColor,
-          mode: 'up',
+          mode: 'end',
         });
         // 存储
-        this.drawImageDown.push(this.drawImageHistory.length);
+        this.pointsLength.push(this.linePoints.length);
       }
     },
 
@@ -349,22 +349,22 @@ export default {
 
     // 撤销涂鸦
     withdrawGraffiti() {
-      const last = this.drawImageDown.pop() || 0;
-      const rest = this.drawImageDown.length
-        ? this.drawImageDown[this.drawImageDown.length - 1]
+      const last = this.pointsLength.pop() || 0;
+      const rest = this.pointsLength.length
+        ? this.pointsLength[this.pointsLength.length - 1]
         : 0;
       // 撤销绘画
-      this.drawImageHistory.splice(rest, last - rest);
+      this.linePoints.splice(rest, last - rest);
       this.redrawAll();
     },
 
     redrawAll() {
-      const length = this.drawImageHistory.length;
+      const length = this.linePoints.length;
       const ratio = this.getPixelRatio(this.context);
 
       const ctx = this.context;
       const width = this.canvasWidth * ratio;
-      const drawImageHistory = this.drawImageHistory;
+      const linePoints = this.linePoints;
       const config = this.config;
 
       // 新建一个 canvas 作为缓存 canvas
@@ -385,10 +385,10 @@ export default {
         ctx.drawImage(tempCanvas, 0, 0);
 
         for (let i = 0; i < length; i++) {
-          const draw = drawImageHistory[i];
+          const draw = linePoints[i];
 
-          if (draw.mode === 'down') {
-            ctx.lineWidth = config.lineWidth + 1;
+          if (draw.mode === 'start') {
+            ctx.lineWidth = config.lineWidth;
             ctx.shadowBlur = config.shadowBlur;
             ctx.shadowColor = draw.color;
             ctx.strokeStyle = draw.color;
@@ -398,7 +398,7 @@ export default {
           if (draw.mode === 'move') {
             ctx.lineTo(draw.x * ratio, draw.y * ratio);
           }
-          if (draw.mode === 'up') {
+          if (draw.mode === 'end') {
             ctx.stroke();
           }
         }
@@ -482,15 +482,15 @@ export default {
       this.visibleBtn = false;
     },
 
-    textItemDown(e, index) {
+    textItemStart(e, index) {
       this.addTexts[index].textItemMoveFlag = true;
       this.$refs.notationCanvasContent.style.overflow = 'hidden';
       // 用来修正移动时造成的问题
       // 判断是两条手指还是一条手指，两根手指放大缩小，一根手指或者其他都是移动
       if (e.touches.length === 2) {
         // 计算两个点位移的距离，根据距离来转化成字体的大小
-        // this.addTexts[index].point1 = {x: e.touches[0].clientX, y: e.touches[0].clientY};
-        // this.addTexts[index].point2 = {x: e.touches[1].clientX, y: e.touches[1].clientY};
+        // this.addTexts[index].point1 = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+        // this.addTexts[index].point2 = { x: e.touches[1].clientX, y: e.touches[1].clientY };
         // this.addTexts[index].angle = this.getAngle(this.addTexts[index].point1, this.addTexts[index].point2);
         // this.addTexts[index].distance = this.getDistance(this.addTexts[index].point1, this.addTexts[index].point2);
         // 暂时不考虑放大缩小了
@@ -509,7 +509,8 @@ export default {
         this.showRemoveText = true;
         const t = e.target;
         const content = t.children[0];
-        const contentOffsetWidth = content.offsetWidth + 1; // 可能会出现差不到1换行
+        // 文字内容的宽度
+        const contentOffsetWidth = content.offsetWidth + 1; // 可能会出现差不到1换行，防止换行
         // 判断是两条手指还是一条手指，两根手指放大缩小，一根手指或者其他都是移动
         if (e.touches.length === 2 && e.changedTouches.length) {
           // 判断一下是否存在有没有移动手指的情况，得到两次移动的情况
@@ -539,33 +540,36 @@ export default {
           // t.style.width = width + 'px';
           // 暂时不考虑放大缩小了
         } else {
+          // 屏幕的宽度
           const offsetWidth = t.parentNode.offsetWidth - 10;
+          // 宽度最大取到屏幕的宽度
           const width =
             contentOffsetWidth > offsetWidth ? offsetWidth : contentOffsetWidth;
-          // text-item-content
-          // 由于手机端和pc端获取页面坐标方式不同，所以需要做出判断
-          var mwidth =
+
+          var moveWidth =
             e.changedTouches[0].clientX -
             this.addTexts[index].moveStartX -
             t.parentNode.offsetLeft;
-          var mheight =
+          var moveHeight =
             e.changedTouches[0].clientY -
             this.addTexts[index].moveStartY -
             t.parentNode.offsetTop +
             (this.$refs.notationCanvasContent.scrollTop || 0);
-          this.addTexts[index].moveEndX = mwidth;
-          this.addTexts[index].moveEndY = mheight;
+          this.addTexts[index].moveEndX = moveWidth;
+          this.addTexts[index].moveEndY = moveHeight;
+          // 通过修改样式控制字体位置
+          console.log('moveWidth', moveWidth)
           if (
-            (mwidth < 0 && -mwidth >= width - 30) ||
-            (mwidth >= 0 && mwidth >= offsetWidth - 30)
-          ) {
+            (moveWidth < 0 && -moveWidth >= width - 30) ||
+            (moveWidth >= 0 && moveWidth >= offsetWidth - 30)
+          ) { // 元素要留有 至少 30px高宽（展开想象的翅膀~~~） 否则回到最初位置
             t.style.left = '50%';
             t.style.top = '50%';
             t.style.marginTop = '-50px';
             t.style.marginLeft = '-' + width / 2 + 'px';
           } else {
-            t.style.left = mwidth + 'px';
-            t.style.top = mheight + 'px';
+            t.style.left = moveWidth + 'px';
+            t.style.top = moveHeight + 'px';
             t.style.marginTop = 'auto';
             t.style.marginLeft = 'auto';
           }
@@ -590,7 +594,7 @@ export default {
         }
       }
     },
-    textItemUp(e, index) {
+    textItemEnd(e, index) {
       this.addTexts[index].textItemMoveFlag = false;
       this.$refs.notationCanvasContent.style.overflow = 'auto';
       if (this.removeTextActive) {
@@ -599,7 +603,6 @@ export default {
       }
       this.showRemoveText = false;
       this.visibleBtn = true;
-      // 记录最后的点
     },
     getAngle(point1, point2) {
       // 得到两个点之间的距离å
@@ -617,7 +620,7 @@ export default {
       const ratio = this.getPixelRatio(this.context);
       // 画上文字
       this.context.font =
-        "31px 'Helvetica Neue', -apple-system-font, sans-serif";
+        "32px 'Helvetica Neue', -apple-system-font, sans-serif";
 
       // 设置颜色
       this.context.fillStyle = addText.textColor;
